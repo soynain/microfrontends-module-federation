@@ -16,3 +16,11 @@ en angular son signals, entonces tienes que estarle jugando al ping pong para es
 si han de ser un infierno.
 
 Acompañenme en esta aventura. Será de los últimos tópicos en estudiar antes de empezar a trabajar.
+
+
+Haremos por el momento una práctica sencillita, porque hay otro tema que me urge ver.
+
+Primero lo primero. De module federation hay dos conceptos: consumers y providers.
+
+Los providers son los microfrontends que estaremos desarrollando. Los consumers el intermediario que los fusiona.
+
