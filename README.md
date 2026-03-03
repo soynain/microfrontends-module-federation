@@ -22,5 +22,188 @@ Haremos por el momento una práctica sencillita, porque hay otro tema que me urg
 
 Primero lo primero. De module federation hay dos conceptos: consumers y providers.
 
-Los providers son los microfrontends que estaremos desarrollando. Los consumers el intermediario que los fusiona.
+Los providers son los microfrontends que estaremos desarrollando. Los consumers el intermediario que los fusiona y los expone.
+
+En microfrontends se menciona mucho el concepto de shell. Los consumers son nuestro shell en este caso. Lo más dificultoso al principio es 
+la configuración, porque he de admitir que la documentación de estos componentes es UN ASCO. Honestamente, antes de la IA tenias que ver tutoriales
+y rezar que te saliera algo. Cada dia se te fuerza más a usar IA. Sería increible que los mantainers crearan buena documentación.
+
+Volviendo al tema, escribiré los puntos que más me costaron configurar:
+
+Cuando crees el setup con npm create module-federation@latest, te aparecerá que si lo quieres
+en modern.js o rsbuild, hasta ahora y porque apenas aprendo el marco, yo uso el modern porque ni sabia que estaba escogiendo.
+
+Seleccionas primero el provider, genera el cascarón de la aplicación. Por default lo genera en React, porque me parece module federation
+apunta más por el mismo framework.
+
+<img width="1186" height="775" alt="image" src="https://github.com/user-attachments/assets/917b9b7f-5884-4c73-acf2-74255339b95d" />
+
+Te ahorraré unos pasos, copia y pega esto en el module-federation.config.ts
+
+````main.ts
+import { createModuleFederationConfig } from '@module-federation/modern-js-v3';
+
+export default createModuleFederationConfig({
+  name: 'mf_microfrontend_practice',
+  filename: 'remoteEntry.js',
+  exposes: {
+    './ProviderCustom': './src/components/ProviderComponent.tsx',
+  },
+  shared: {
+    react: { singleton: true },
+    'react-dom': { singleton: true },
+  },
+  manifest:true,
+  dts: {
+    generateTypes: true,
+  },
+});
+
+````
+
+El manifest true es para que se te genere el archivo mf-manifest.json que servirá para exponer tu micro al shell. El
+dfs.generatedTypes es para exponer los tipos de componentes que creas desde tu micro, y conectarlos para que tu consumidor los pueda instanciar.
+
+Después haz las modificaciones pertinentes en digamos... el componente de ejemplo y en modern.config.ts pega esto:
+
+````main.ts
+import { appTools, defineConfig } from '@modern-js/app-tools';
+import { moduleFederationPlugin } from '@module-federation/modern-js-v3';
+
+// https://modernjs.dev/en/configure/app/usage
+export default defineConfig({
+  plugins: [appTools(), moduleFederationPlugin()],
+  server: {
+    port: 3001,
+  },
+  tools: {
+    // Modern.js usa esta sección para extender la config del servidor de desarrollo
+    devServer: {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+        'Access-Control-Allow-Headers': '*',
+      },
+    },
+  },
+
+});
+
+
+````
+
+La configuracion del tools dev sirve para que puedas exponer tu micro correctamente, y el consumer detecte
+el archivo mf-manifest.js
+
+Ahora, un paso escencial para poder conectar tus micros es ejecutar
+
+````main.sh
+npm run build
+````
+
+Esto te generará los archivos remoteEntry.js y el manifest que servirán para exponer y vincular tu micro. La manera
+más fácil de saber si tu micro está expuesto es por dos checks:
+
++Check de manifest*
+
+<img width="2558" height="1439" alt="image" src="https://github.com/user-attachments/assets/8a3f1deb-1376-4249-8a26-de37856047b8" />
+
+
+*Check del componente unitario*
+
+<img width="2545" height="1439" alt="image" src="https://github.com/user-attachments/assets/3418c0b5-f2c9-4ceb-9c3e-b2e826a28725" />
+
+Si no lo haces vas a batallar con este error
+
+<img width="1186" height="552" alt="image" src="https://github.com/user-attachments/assets/137d2937-3e30-4c73-a5b5-a304118307df" />
+
+
+Para generar el consumer (shell) es lo mismo desde el npm create escoges consumer en vez de provider, te dará el siguiente cascarón, 
+y ejecutas de nuevo el npm run build.
+
+<img width="1354" height="1013" alt="image" src="https://github.com/user-attachments/assets/27708b0a-1394-488c-8a5b-7a1233e31abb" />
+
+En el archivo module-federation.config.ts del consumer declaras lo siguiente:
+
+````main.ts
+import { createModuleFederationConfig } from '@module-federation/modern-js-v3';
+
+export default createModuleFederationConfig({
+  name: 'mf_microfrontend_consumer',
+  remotes: {
+    'provider': 'rslib_provider@https://unpkg.com/module-federation-rslib-provider@latest/dist/mf/mf-manifest.json',
+    'remote': 'mf_microfrontend_practice@http://localhost:3001/mf-manifest.json'
+  },
+  shared: {
+    react: { singleton: true },
+    'react-dom': { singleton: true },
+  },
+  dts: {
+    consumeTypes: true,
+  },
+});
+````
+
+Declaras un nuevo scope remote e introduces el endpoint de tu micro front para conectar tu micro unitario al
+shell.
+
+
+
+
+Y para adaptarlo, usa el siguiente snippet:
+
+````main.ts
+import { Helmet } from '@modern-js/runtime/head';
+import './index.css';
+import { lazy } from 'react';
+//import Provider from 'provider';
+import { loadRemote } from '@module-federation/enhanced/runtime';
+
+
+const IndexCustom = lazy(() =>
+  loadRemote('mf_microfrontend_practice/IndexCustom').then((mod: any) => ({
+    default: mod.default
+  }))
+);
+
+const Index = () => (
+  <div className="container-box">
+    <Helmet>
+      <link
+        rel="icon"
+        type="image/x-icon"
+        href="https://lf3-static.bytednsdoc.com/obj/eden-cn/uhbfnupenuhf/favicon.ico"
+      />
+    </Helmet>
+
+    <div className="landing-page-2">
+      dasdasd
+    </div>
+
+    <div className='remoteDom'>
+      <IndexCustom/>
+    </div>
+  </div>
+);
+
+export default Index;
+
+````
+
+Lo adaptas como un componente normal, y lo invocas en tag que quieras, y recuerda que al adaptar el componente a tu consumer, 
+también pueden chocar las clases padre por el css.
+
+*Check del componente integrado en consumer (patrón microfrontend)*
+<img width="2447" height="1439" alt="image" src="https://github.com/user-attachments/assets/2cd7a580-e854-4700-8dac-671dd17e48f4" />
+
+Por cada update que hagas en tu componente, se refleja en automático en tu componente, pero si vas a crear otro componente, tendrás que declararlo
+en tus configs siempre, uno por uno y ejecutar npm run build para sincronizar los tipados:
+
+<img width="855" height="220" alt="image" src="https://github.com/user-attachments/assets/eb24ec4e-eaa2-4366-bcf8-7a6853f2ac86" />
+
+Esto es lo básico de un microfrontend. ¿Ahora que pasa si quiero adaptar el componente de otro framework?
+
+El proyecto más próximo que tengo es un micro de angular. Vamos a ver que tal, en base a un desglose, veremos como conectar eventos.
+
+
 
