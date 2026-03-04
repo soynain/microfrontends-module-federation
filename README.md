@@ -253,4 +253,8 @@ Necesitaré más tiempo para ir acoplando este pex, pero al menos ya vi cual fue
 Hasta ahora lo que hemos logrado conectar son componentes remotos de react, para el tema de no acoplar todo sobre un solo code base
 y no tengas merge conflicts, y un iframe para conectar un componente externo de angular
 
-Debo checar más sobre webpack.
+Debo checar más sobre webpack. Pero creo que si hay muchos temas de compatibilidad entre estos approaches que intento hacer con module
+federation ,native federation, creo solo sirven para desglosar un monolito y separar, pero no para integrar multi frameworks, eso solo
+con iframes o single spa....
+
+Una manera dura de aprenderlo, hasta claude anda fastidiado.
