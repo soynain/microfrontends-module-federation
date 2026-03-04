@@ -205,5 +205,21 @@ Esto es lo básico de un microfrontend. ¿Ahora que pasa si quiero adaptar el co
 
 El proyecto más próximo que tengo es un micro de angular. Vamos a ver que tal, en base a un desglose, veremos como conectar eventos.
 
+## Avances 03/03/2026 
 
+Al parecer modern.js está orientado más al desglose de un monólito react que sobre una comunicación entre distintos frameworks.
+Hasta ahora llevo un dolor de cabeza grande entre claude, la virgen y lo que sea. En primeras está cañón y creo no hay compatibilidad entre 
+@angular-architects/module-federation y module-federation v2.0. Entonces, el approach más antiguo entre micros es por iframe:
+
+Otra cuestión es que rsbuild actualmente tiene una apertura de más facilidad a adaptar los multi frameworks, modern.js es más orientado a
+descomponer en pequeños fragmentos una app en react.
+
+El approach más básico es el iframe
+
+<img width="2413" height="1439" alt="image" src="https://github.com/user-attachments/assets/2c3e7f2a-4155-49d8-a917-e455afd1300d" />
+
+Funciona normal pues... pero hasta ahora no es lo que yo deseo.
+
+El module federation de rs build del module federation no tiene compatibilidad hasta ahora con react, tendria que ser por webpack puro por lo 
+que estoy checando
 
