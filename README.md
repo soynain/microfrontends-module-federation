@@ -266,3 +266,101 @@ Porque quise hacer un wrapper pero no, asi no jala aun asi
 <img width="1523" height="1030" alt="image" src="https://github.com/user-attachments/assets/403cced5-cc0b-4ea3-911c-c7be2c63d5ec" />
 
 Y desde angular también he intentado con los webcomponents pero aunque se diga que si, no hay compatibilidad realmente.
+
+## Avances 04/03/2026
+
+Claude me dio una alternativa interesante que es la herramienta NX, con la cual algunos colaboradores cercanos de module federation
+trabajan en conjunto. Es una herramienta que sirve para establecer un ambiente de desarrollo monorepo, orientado a la conexión de microfrontends
+por medio de un solo runtime de module federation y la abstracción de dependencias comunes entre los dos o más proyectos separados.
+
+Es una manera efectiva de conectar un host con react a angular o vue o viceversa, en cualquier combinación posible.
+
+Te dejo los comandos a ejecutar:
+
+````main.sh
+npx create-nx-workspace@latest mi-workspace --preset=empty
+
+cd mi-workspace
+
+# Agregar Angular
+$env:NX_IGNORE_UNSUPPORTED_TS_SETUP="true"
+npx nx add @nx/angular
+
+# Agregar React  
+npx nx add @nx/react
+
+# React como host
+npx nx g @nx/react:host mfreacthost --remotes=mfangularremote --bundler=rspack
+
+# Angular como remote
+npx nx g @nx/angular:remote mfangularremote --host=mfreacthost --bundler=rspack
+
+## ejecuta el host y levantará react y angular
+npx nx serve mfreacthost
+````
+
+En consola te debe aparecer así, significa que ya arranco el proyecto:
+
+<img width="1656" height="500" alt="image" src="https://github.com/user-attachments/assets/93582e4f-40a8-48b7-94f9-b0c87203886b" />
+
+
+Y ya te carga ambos componentes, es un parent app de react conectado a un angular app como componente:
+
+<img width="2401" height="910" alt="image" src="https://github.com/user-attachments/assets/0fb25068-4856-46ef-8330-1918b2197ae2" />
+
+<img width="2076" height="547" alt="image" src="https://github.com/user-attachments/assets/6cad0633-c99e-47ba-b5ed-3707f02cf467" />
+
+
+Los puedes conectar por medio de librerias
+
+````main.ts
+// libs/event-bus/src/index.ts
+import { Subject } from 'rxjs';
+
+export const formSubmit$ = new Subject<any>();
+
+import { formSubmit$ } from 'event-bus';
+onSubmit() {
+  formSubmit$.next(this.userModel.value);
+}
+
+/*Y en react*/
+import { formSubmit$ } from 'event-bus';
+useEffect(() => {
+  const sub = formSubmit$.subscribe(data => console.log(data));
+  return () => sub.unsubscribe();
+}, []);
+
+//También por medio de custom events:
+// En el componente Angular
+onSubmit() {
+  window.dispatchEvent(new CustomEvent('angular:form-submit', {
+    detail: { data: this.userModel.value },
+    bubbles: true
+  }));
+}
+
+// En React host
+useEffect(() => {
+  const handler = (e: any) => {
+    console.log('Datos de Angular:', e.detail.data);
+  };
+  window.addEventListener('angular:form-submit', handler);
+  return () => window.removeEventListener('angular:form-submit', handler);
+}, []);
+
+````
+
+Entonces llegamos con esta introducción a las siguientes conclusiones:
+
+-No pierdas el tiempo queriendo adaptar MF's de diversos aplicativos sin un bridge de los pocos que ofrecen
+
+-Single spa y Nx te solucionan el tema de los cross framework
+
+-Angular acrhitect y modern js solo aplica en modalidades del desglose de de tu monolito. Aunque por lo que vemos
+pudieramos combinar el MF con el mismo NX y lograr un desglose en los monorepos también, pero si viene siento más complejidad aún
+
+-Iframes puede ser una solución más rápida y fácil para adaptar cross, así como el proteger ese componente expuesto.
+
+Creo que hemos logrado dominar lo básico de microfrontends, ya cuando chambeé ya estudiaré codigos ajenos.
+
