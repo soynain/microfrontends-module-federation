@@ -223,3 +223,34 @@ Funciona normal pues... pero hasta ahora no es lo que yo deseo.
 El module federation de rs build del module federation no tiene compatibilidad hasta ahora con react, tendria que ser por webpack puro por lo 
 que estoy checando. Por lo que veo el framework que tiene esa finalidad es el single spa.
 
+Después de promptear por un buen rato, me di cuenta de algo:
+
+No hay adaptación natural entre el module federation de angular y react. No pierdan su tiempo. Tal parece que los approaches 
+si deben ser por wireframes para la orquestación de algunos tiempos:
+
+<img width="2267" height="1355" alt="image" src="https://github.com/user-attachments/assets/264a941d-2391-414c-9f9f-5d6295822f17" />
+
+Y la comunicación involucra usar el postmessage 
+
+<img width="2559" height="1439" alt="image" src="https://github.com/user-attachments/assets/e1380616-65ab-4b6b-b965-e7aa59e8af0a" />
+
+No es lo que esperaba, si es un campo nuevecito para mi este rollo.
+
+Necesitaré más tiempo para ir acoplando este pex, pero al menos ya vi cual fue el tema masomenos...
+
+````masn.md
+| Remote | Host | ¿Funciona? | Condición |
+|---|---|---|---|
+| React (Webpack) | React (Webpack) | ✅ | Misma versión MF |
+| React (Rsbuild MF v2) | React (Rsbuild MF v2) | ✅ | Mismo runtime |
+| Vue (Webpack) | React (Webpack) | ✅ | Mismo bundler |
+| Angular (Webpack MF v1) | React (Webpack MF v1) | ✅ | Mismo bundler y versión |
+| Angular (Webpack MF v1) | React (Rsbuild MF v2) | ❌ | Runtime mismatch — fue tu problema |
+| Angular (Rsbuild/Nx) | React (Rsbuild MF v2) | ✅ | Mismo runtime |
+| Cualquier framework | Cualquier framework | ✅ | Siempre que compartan el mismo runtime de MF |
+````
+
+Hasta ahora lo que hemos logrado conectar son componentes remotos de react, para el tema de no acoplar todo sobre un solo code base
+y no tengas merge conflicts, y un iframe para conectar un componente externo de angular
+
+Debo checar más sobre webpack.
