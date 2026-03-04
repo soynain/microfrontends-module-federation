@@ -364,3 +364,12 @@ pudieramos combinar el MF con el mismo NX y lograr un desglose en los monorepos 
 
 Creo que hemos logrado dominar lo básico de microfrontends, ya cuando chambeé ya estudiaré codigos ajenos.
 
+Fuentes para consultar a futuro:
+
+https://medium.com/cars24/nx-module-federation-a-scalable-solution-for-hosting-multiple-micro-frontend-applications-with-git-eee04fbd0b4f
+
+https://nx.dev/docs/technologies/module-federation/concepts/module-federation-and-nx
+
+https://nx.dev/docs/technologies/angular/guides/dynamic-module-federation-with-angular
+
+https://nx.dev/docs/technologies/module-federation/concepts/manage-library-versions-with-module-federation#4-singleton-libraries
