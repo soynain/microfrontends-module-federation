@@ -258,3 +258,6 @@ federation ,native federation, creo solo sirven para desglosar un monolito y sep
 con iframes o single spa....
 
 Una manera dura de aprenderlo, hasta claude anda fastidiado.
+
+<img width="2540" height="1439" alt="image" src="https://github.com/user-attachments/assets/e9f54b60-c322-4dcb-917f-a54a94863ae7" />
+
