@@ -221,5 +221,5 @@ El approach más básico es el iframe
 Funciona normal pues... pero hasta ahora no es lo que yo deseo.
 
 El module federation de rs build del module federation no tiene compatibilidad hasta ahora con react, tendria que ser por webpack puro por lo 
-que estoy checando
+que estoy checando. Por lo que veo el framework que tiene esa finalidad es el single spa.
 
