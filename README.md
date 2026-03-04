@@ -261,3 +261,8 @@ Una manera dura de aprenderlo, hasta claude anda fastidiado.
 
 <img width="2540" height="1439" alt="image" src="https://github.com/user-attachments/assets/e9f54b60-c322-4dcb-917f-a54a94863ae7" />
 
+Porque quise hacer un wrapper pero no, asi no jala aun asi
+
+<img width="1523" height="1030" alt="image" src="https://github.com/user-attachments/assets/403cced5-cc0b-4ea3-911c-c7be2c63d5ec" />
+
+Y desde angular también he intentado con los webcomponents pero aunque se diga que si, no hay compatibilidad realmente.
